@@ -75,7 +75,21 @@ var modbass = flock.synth({
     }
 });
 
-
+var drumthing = flock.synth({
+        synthDef: {
+            id : "drum", 
+            ugen: "flock.ugen.sinOsc",
+            freq: 440,
+            mul: {
+                ugen: "flock.ugen.asr",
+                start: 0.0,
+                attack: 0.25,
+                sustain: 0.25,
+                release: 1.0,
+                gate: 0,
+        }
+    }
+});
 
 window.midiConnection = flock.midi.connection({
     openImmediately: true,
@@ -86,8 +100,22 @@ window.midiConnection = flock.midi.connection({
 
     listeners: {
                    control: function (msg) {
-                                //synth.set("freq.source", msg.value);
-                                console.log("Control:", msg);
-                            }
+                                //console.log("Control:", msg);
+                                switch(msg.number){
+                                    case 1: 
+                                        break;
+                                    case 8:
+                                        bass.set("bass.freq.add", msg.value); 
+                                        break; 
+                                }
+                            },
+                   noteOn: function(msg){
+                              console.log(msg); 
+                              drumthing.set("drum.mul.gate",1); 
+                              drumthing.set("drum.freq",msg.note*10); 
+                           },
+                   noteOff: function(msg){
+                              drumthing.set("drum.mul.gate",0); 
+                            },
                }
 });
