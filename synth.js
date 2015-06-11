@@ -48,7 +48,7 @@ var bass = flock.synth({
             freq: 0.1234,
             mul: 5,
         }, 
-        mul : 0.05,
+        mul : 0,
     }
 });
 
@@ -100,18 +100,35 @@ window.midiConnection = flock.midi.connection({
 
     listeners: {
                    control: function (msg) {
-                                //console.log("Control:", msg);
                                 switch(msg.number){
-                                    case 1: 
+				    case 1: 
+				       synth.set("righthat.mul.gate.freq", msg.value/50);
+				       synth.set();
+			               break;
+				    case 2:
+				       synth.set("righthat.mul.gate.freq", msg.value/50);
+				       synth.set("lefthat.mul.gate.freq", msg.value/50);
+				       synth.set("righthat.mul.gate.phase", 0);
+				       synth.set("lefthat.mul.gate.phase", 0);
+				       break;
+				    case 5:
+					bass.set("bass.freq.freq", msg.value/100);
+					break;
+                                    case 6: 
+					bass.set("bass.freq.mul",msg.value/10);
                                         break;
+				    case 7:
+					bass.set("bass.mul",msg.value/127);
+					break;
                                     case 8:
                                         bass.set("bass.freq.add", msg.value); 
                                         break; 
                                 }
                             },
                    noteOn: function(msg){
-                              console.log(msg); 
                               drumthing.set("drum.mul.gate",1); 
+                              drumthing.set("drum.mul.sustain",msg.velocity/127); 
+                              drumthing.set("drum.mul.release", 1.01 - (msg.velocity/127) ); 
                               drumthing.set("drum.freq",msg.note*10); 
                            },
                    noteOff: function(msg){
